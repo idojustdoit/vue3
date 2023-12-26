@@ -3,18 +3,26 @@
       메인페이지
       <div>
         <div>
-          goal achieved<br />
+          해야할 일<br />
+          {{ thingToDoCount }}
+        </div>
+        <div>
+          이미한 일<br />
           {{ goalAchievedCount }}
+        </div>
+        <div>
+          전체 일 <br />
+          {{ totalTaskList }}
         </div>
       </div>
       <button @click="showModal()">클릭</button>
     </div>
-    <addModal ref="showComponent" :MainTaskList="MainTaskList" />
+    <addModal ref="showComponent"  />
   </template>
   
   <script>
   import addModal from '../sub/AddModal.vue';
-  import { ref, onMounted, computed, watch } from 'vue';
+  import { ref, onMounted, computed,provide  } from 'vue';
   
   export default {
     components: {
@@ -32,24 +40,35 @@
         return MainTaskList.value.filter(obj => !obj['complete']).length;
       });
   
-      const savedTaskList = localStorage.getItem('todos');
+      const thingToDoCount = computed(()=>{
+        return MainTaskList.value.filter(obj => obj['complete']).length;
+      })
+      const totalTaskList = computed(()=>{
+        return MainTaskList.value.length
+      })
   
-      onMounted(() => {
+      const LoadTodoList = () =>{
+        
+      const savedTaskList = localStorage.getItem('todos');
+      
         if (savedTaskList) {
           MainTaskList.value = JSON.parse(savedTaskList);
         }
+      }
+      onMounted(() => {
+        LoadTodoList();
       });
 
-      // Watch for changes in MainTaskList and update the localStorage
-      watch(MainTaskList, () => {
-        localStorage.setItem('todos', JSON.stringify(MainTaskList.value));
-      });
+
+      provide('LoadTodoList', LoadTodoList);
   
       return {
         showComponent,
         showModal,
         goalAchievedCount,
-        MainTaskList,
+        thingToDoCount,
+        LoadTodoList,
+        totalTaskList
       };
     },
   };

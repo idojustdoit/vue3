@@ -2,37 +2,32 @@
   <div class="background" v-if="show" @click.self="hideModal">
     <div class="modal">
       <input v-model="newTask"   @keyup.enter="addTask"/>
-    <div v-for="(item,index) in MainTaskList" :key="index">
-      {{ item.text }} <button @click="removeTodo(index)"> remove</button>
-    </div>
     </div>
   </div>
   
   </template>
 
 <script>
-import { ref, onMounted } from 'vue'
+import { ref, inject, onMounted } from 'vue'
+
+
 export default {
-  props:{
-    MainTaskList:Array
-  },
-  emits: ['updateList'],
-setup(props,{ emit }) {
+
+setup() {
 const newTask = ref('');
+const taskList = ref([])
 const show = ref(false);
+const LoadTodoList = inject('LoadTodoList');
 
 
+onMounted(() => {
+  const savedTaskList = localStorage.getItem('todos');
+      if (savedTaskList) {
+        taskList.value = JSON.parse(savedTaskList);
+      }
 
-onMounted(()=>{
-
-
-  const savedTaskList = localStorage.getItem("todos");
-
-  if(savedTaskList){
-    props.MainTaskList.value = JSON.parse(savedTaskList);
-  }
-});
-
+      
+    })
 
 const showModal = ()=>{
   show.value = true;
@@ -41,21 +36,21 @@ const hideModal = ()=>{
   show.value = false;
 }
 const saveTodo = () => {
-  const updateList= [...props.MainTaskList, {text: newTask.value ,complete:false}]
-  localStorage.setItem("todos", JSON.stringify(updateList.value));
+  localStorage.setItem("todos", JSON.stringify(taskList.value));
 }
 const addTask = () =>{
   if (newTask.value.trim() === "") return;
-  const updateList= [...props.MainTaskList, {text: newTask.value ,complete:false}]
-  emit('updateList', updateList);
+  taskList.value.push({title: newTask.value ,complete:true});
   newTask.value = '';
   saveTodo();
+  LoadTodoList();
 }
 
 const removeTodo = (index)=>{
-  props.MainTaskList.value.splice(index,1);
+  taskList.value.splice(index,1);
   saveTodo();
 }
+
 
 return{
   newTask,
@@ -63,7 +58,8 @@ return{
   addTask,
   removeTodo,
   showModal,
-  hideModal
+  hideModal,
+  LoadTodoList
 }}
 }
 </script>
