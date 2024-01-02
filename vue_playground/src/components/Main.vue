@@ -24,6 +24,7 @@
   import addModal from '../sub/AddModal.vue';
   import { ref, onMounted, computed,provide  } from 'vue';
   
+  
   export default {
     components: {
       addModal,
