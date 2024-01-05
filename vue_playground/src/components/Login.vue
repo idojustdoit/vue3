@@ -20,7 +20,7 @@
           편지 접속
         </div>
         <div class="login_tab" @click="loginType('phone')">
-          똑똑 전화번호 접속
+          똑똑 전화번호 <br/>접속
         </div>
         <div class="login_tab" @click="signup">
          Sign up
@@ -122,11 +122,12 @@
     padding: 30px;
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
-
   }
   .type_box{
+
     display: flex;
     justify-content: center;
+    margin-top: 100px;
   }
   .login_tab{
     width: 100%;

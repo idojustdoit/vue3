@@ -1,3 +1,52 @@
+<script setup>
+import { ref, inject, onMounted } from 'vue'
+import { useUserInfoStore } from "../store/UseStore";
+
+
+
+const newTask = ref('');
+const taskList = ref({});
+const show = ref(false);
+const userStore = useUserInfoStore();
+
+onMounted(() => {
+  const savedTaskList = localStorage.getItem('todos');
+      if (savedTaskList) {
+        taskList.value = JSON.parse(savedTaskList);
+      }
+
+    })
+
+const showMode = () => { 
+  show.value = true;
+}
+
+const hideModal = () => {
+  show.value = false;
+}
+const saveTodo = () => {
+  localStorage.setItem("todos", JSON.stringify(taskList.value));
+}
+const addTask = () => {
+  if (newTask.value.trim() === "") return;
+  taskList.value = {title: newTask.value};
+  userStore.addTodoList(taskList.value);
+  newTask.value = '';
+
+
+}
+
+const removeTodo = (index)=>{
+  taskList.value.splice(index,1);
+  saveTodo();
+}
+defineExpose({
+  showMode
+})
+
+</script>
+
+
 <template>
   <div class="background" v-if="show" @click.self="hideModal">
     <div class="modal">
@@ -7,62 +56,6 @@
   
   </template>
 
-<script>
-import { ref, inject, onMounted } from 'vue'
-
-
-export default {
-
-setup() {
-const newTask = ref('');
-const taskList = ref([])
-const show = ref(false);
-const LoadTodoList = inject('LoadTodoList');
-
-
-onMounted(() => {
-  const savedTaskList = localStorage.getItem('todos');
-      if (savedTaskList) {
-        taskList.value = JSON.parse(savedTaskList);
-      }
-
-      
-    })
-
-const showModal = ()=>{
-  show.value = true;
-}
-const hideModal = ()=>{
-  show.value = false;
-}
-const saveTodo = () => {
-  localStorage.setItem("todos", JSON.stringify(taskList.value));
-}
-const addTask = () =>{
-  if (newTask.value.trim() === "") return;
-  taskList.value.push({title: newTask.value ,complete:true});
-  newTask.value = '';
-  saveTodo();
-  LoadTodoList();
-}
-
-const removeTodo = (index)=>{
-  taskList.value.splice(index,1);
-  saveTodo();
-}
-
-
-return{
-  newTask,
-  show,
-  addTask,
-  removeTodo,
-  showModal,
-  hideModal,
-  LoadTodoList
-}}
-}
-</script>
 
 
 
