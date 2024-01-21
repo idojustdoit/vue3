@@ -9,7 +9,8 @@ import { useUserInfoStore } from "../store/UseStore";
     const showComponent = ref(null);
     const MainTaskList = ref([]);
     const userStore = useUserInfoStore();
-
+    const modifiedTitle = ref([]);
+    const todolist = userStore.todoList
     const showModal = () => {
       showComponent.value.showMode();
     };
@@ -25,9 +26,18 @@ import { useUserInfoStore } from "../store/UseStore";
     //   return MainTaskList.value.length
     // })
 
+    const deleteTodo =(item)=>{
+      userStore.deleteTodolist(item);
+    }
     
-    onMounted(() => {
 
+    const updateTodo = (item,modifiedItem) => {
+      console.log(item,modifiedItem);
+      userStore.updateTodolist(item,modifiedItem);
+    }
+
+    onMounted(() => {
+   
     });
 
 
@@ -38,6 +48,13 @@ import { useUserInfoStore } from "../store/UseStore";
     <div class="back">
       메인페이지
       <div>
+        <div v-for="(item, index) in todolist.value" :key="item.id">
+          <div>{{ item.title }}</div>
+          <input v-model="modifiedTitle[index]"/>
+          <button @click="updateTodo(item,'completed')">완료하기</button>
+          <button @click="updateTodo(item,modifiedTitle[index])">수정하기</button>
+          <button @click="deleteTodo(item.id)">삭제하기</button>
+        </div>
         <!-- <div>
           해야할 일<br />
           {{ thingToDoCount }}

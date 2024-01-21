@@ -9,9 +9,10 @@ const isLogin = ref(false);
 const todoList = reactive([]);
 
 
-const loadUserInfo = computed(()=>{
+const loadUserInfo = computed(()=>{     //로그인 유무확인 및 사용자 이름정보 가져오기
   authService.onAuthStateChanged(function(user) {
     if (user) {
+      
       console.log('로그인중입니다',user.displayName);
       userName.value = user.displayName;
       isLogin.value =true;
@@ -23,7 +24,7 @@ const loadUserInfo = computed(()=>{
   });
 })
 
-async function addTodoList (item){
+async function addTodoList (item){   //todolist 항목 추가하기
   const id = (todoList.value.length + 1).toString()
   console.log(id);
      try {
@@ -39,7 +40,40 @@ async function addTodoList (item){
   }
       
 }
-async function loadTodoList (){
+
+async function updateTodolist (item,completed){
+
+  try{
+    console.log(item,completed)
+    if(completed === "completed"){
+      await updateDoc(doc(db, userName.value ,item.id),{
+        completed: true
+      })
+
+      console.log("투두리스트 수정성공");
+    } else{
+      await updateDoc(doc(db, userName.value ,item.id),{
+        title: completed
+      })
+    }
+
+    loadTodoList();
+  }catch(e){
+    console.error(e)
+  }   
+}
+
+async function deleteTodolist (item){
+  try{
+    await deleteDoc(doc(db, userName.value ,item))
+    console.log("투두리스트 제거성공");
+    loadTodoList();
+  }catch(e){
+    console.error(e)
+  }   
+}
+
+async function loadTodoList (){           //현재 사용자의 Todolist 목록 정보 가져오기
   todoList.value = [];
   const querySnapshot = await getDocs(collection(db, userName.value));
   querySnapshot.forEach((doc) => {
@@ -54,5 +88,5 @@ async function loadTodoList (){
   });
   console.log(todoList);
 }
-return {isLogin, userName,loadUserInfo, todoList ,addTodoList ,loadTodoList }
+return {isLogin, userName,loadUserInfo, todoList ,addTodoList , updateTodolist,deleteTodolist,loadTodoList }
 })
