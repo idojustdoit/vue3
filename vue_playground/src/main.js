@@ -11,5 +11,5 @@ import"./assets/font.css"
 
 const pinia = createPinia()
 const app = initializeApp(firebaseConfig);
-
-createApp(App).use(router,pinia).mount('#app');
+createApp(App).use(pinia)
+createApp(App).use(router).mount('#app');
